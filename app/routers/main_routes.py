@@ -1,13 +1,10 @@
-from fastapi import APIRouter
-from ..dependencies.schemas import GenerateComplaintRequest
-router = APIRouter()
+from fastapi import APIRouter, Request
 
-@router.get("/")
-async def root():
-    return {"message": "Hello World"}
+app = APIRouter()
 
-
-@router.post("/generate_complaint")
-async def generate_complaint(data: GenerateComplaintRequest):
-    return {"message": "Complaint generated"}
-
+@app.get("/")
+async def root(
+    request: Request
+):
+    html_templates = request.app.state.templates
+    return html_templates.TemplateResponse("index.html", {"request": request})

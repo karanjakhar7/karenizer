@@ -7,8 +7,9 @@
 <body>
     <h1>Karenizer</h1>
     <!-- upload picture -->
-    <form action="/upload" method="post" enctype="multipart/form-data">
-        <input type="file" name="file">
+    <form action="/generate_complaint" method="post" enctype="multipart/form-data">
+        <label for="file">Image:</label>
+        <input type="file" id="file" name="file" accept=".png, .jpeg, .jpg">
         <button type="submit">Upload</button>
     </form>
 </body>

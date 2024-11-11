@@ -1,7 +1,7 @@
 from fastapi import UploadFile, File
 from pydantic import BaseModel, Field
 from enum import Enum
-from typing import Literal, Optional
+# from typing import Literal, Optional
 
 class ComplaintType(Enum):
     customer_service = "customer_service"
@@ -12,6 +12,6 @@ class ComplaintType(Enum):
 class GenerateComplaintRequest(BaseModel):
     company_name: str
     complaint_body: str
-    complaint_type: Optional[ComplaintType] = Field(default=ComplaintType.customer_service)
+    complaint_type: ComplaintType | None = Field(default=ComplaintType.customer_service)
     karen_level: int = Field(default=0, ge=0, le=5)
-    file: Optional[UploadFile] = File(...)
+    file: UploadFile | None = File(...)
