@@ -3,7 +3,7 @@ from fastapi import FastAPI
 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
-from .routers import apis
+from .routers import apis, main_routes
 
 app = FastAPI()
 
@@ -25,6 +25,7 @@ app.add_middleware(
 
 
 app.include_router(apis.router)
+app.include_router(main_routes.app)
 
 if __name__ == "__main__":
     import uvicorn
