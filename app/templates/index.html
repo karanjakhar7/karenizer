@@ -1,17 +1,534 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Karenizer</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KARENIZER — Complain Like a Legend</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0a0a0f;
+      --surface:  #111118;
+      --surface2: #1a1a24;
+      --border:   #252535;
+      --red:      #ef4444;
+      --red-dk:   #dc2626;
+      --gold:     #f59e0b;
+      --text:     #f1f5f9;
+      --muted:    #94a3b8;
+      --green:    #22c55e;
+      --r:        12px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER ── */
+    header {
+      text-align: center;
+      padding: 3rem 1rem 2rem;
+      background: linear-gradient(180deg, #1a0808 0%, transparent 100%);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--gold);
+      color: #000;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      padding: 0.25em 0.8em;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 7vw, 4.5rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--red) 0%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.6rem;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* ── LAYOUT ── */
+    main {
+      flex: 1;
+      max-width: 1180px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 2rem 1rem 3rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    @media (max-width: 740px) {
+      main { grid-template-columns: 1fr; }
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.75rem;
+    }
+
+    .card-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.4rem;
+    }
+
+    /* ── FORM ── */
+    .field { margin-bottom: 1.25rem; }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+
+    input[type="text"],
+    textarea,
+    select {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.92rem;
+      padding: 0.65rem 0.9rem;
+      transition: border-color 0.15s;
+      outline: none;
+      font-family: inherit;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus,
+    select:focus { border-color: var(--red); }
+
+    textarea { resize: vertical; min-height: 110px; }
+
+    select option { background: var(--surface2); }
+
+    /* ── KAREN SLIDER ── */
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.55rem;
+    }
+
+    #karen-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2em 0.65em;
+      border-radius: 20px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: linear-gradient(to right, #22c55e, #84cc16, #eab308, #f97316, #ef4444, #7c3aed);
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid var(--red);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid var(--red);
+      cursor: pointer;
+    }
+
+    .ticks {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1rem;
+      margin-top: 0.35rem;
+      line-height: 1;
+      user-select: none;
+    }
+
+    /* ── SUBMIT ── */
+    .btn-primary {
+      width: 100%;
+      padding: 0.9rem;
+      background: linear-gradient(135deg, var(--red-dk) 0%, var(--red) 100%);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.15s;
+      margin-top: 0.5rem;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(239,68,68,0.4);
+    }
+
+    .btn-primary:active:not(:disabled) { transform: translateY(0); }
+
+    .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    /* ── RESULT STATES ── */
+    .state-empty {
+      text-align: center;
+      padding: 3.5rem 1.5rem;
+    }
+
+    .state-empty .big-icon {
+      font-size: 4rem;
+      display: block;
+      margin-bottom: 1rem;
+      line-height: 1;
+    }
+
+    .state-empty p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .state-loading {
+      text-align: center;
+      padding: 3.5rem 1.5rem;
+    }
+
+    .spin {
+      display: inline-block;
+      font-size: 3rem;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 1rem;
+      line-height: 1;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-label {
+      color: var(--gold);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .error-box {
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.25);
+      border-radius: 8px;
+      padding: 1rem 1.1rem;
+      font-size: 0.85rem;
+      color: #fca5a5;
+      line-height: 1.5;
+    }
+
+    .meta-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3em;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.3em 0.75em;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--muted);
+    }
+
+    .complaint-output {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-size: 0.9rem;
+      line-height: 1.75;
+      white-space: pre-wrap;
+      color: var(--text);
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    .result-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .btn-sec {
+      flex: 1;
+      padding: 0.6rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .btn-sec:hover {
+      border-color: var(--muted);
+      background: var(--border);
+    }
+
+    .btn-sec.copied {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+  </style>
 </head>
 <body>
-    <h1>Karenizer</h1>
-    <!-- upload picture -->
-    <form action="/generate_complaint" method="post" enctype="multipart/form-data">
-        <label for="file">Image:</label>
-        <input type="file" id="file" name="file" accept=".png, .jpeg, .jpg">
-        <button type="submit">Upload</button>
+
+<header>
+  <div class="badge">COMPLAINT AMPLIFIER</div>
+  <h1>&#x26A1; KARENIZER</h1>
+  <p class="subtitle">Transform your grievance into a legendary complaint. The world deserves to feel your wrath.</p>
+</header>
+
+<main>
+  <!-- LEFT: INPUT FORM -->
+  <div class="card">
+    <div class="card-label">Your Grievance</div>
+    <form id="form">
+
+      <div class="field">
+        <label for="company">Company / Business Name</label>
+        <input type="text" id="company" name="company_name"
+               placeholder="e.g. Amazon, Starbucks, United Airlines"
+               required maxlength="200" />
+      </div>
+
+      <div class="field">
+        <label for="body">What Happened?</label>
+        <textarea id="body" name="complaint_body" required
+                  minlength="10" maxlength="5000"
+                  placeholder="Describe your unfortunate experience in glorious detail..."></textarea>
+      </div>
+
+      <div class="field">
+        <label for="type">Category</label>
+        <select id="type" name="complaint_type">
+          <option value="customer_service">Customer Service</option>
+          <option value="product_quality">Product Quality</option>
+          <option value="billing_and_payment">Billing &amp; Payment</option>
+          <option value="food_and_dining">Food &amp; Dining</option>
+          <option value="shipping_and_delivery">Shipping &amp; Delivery</option>
+          <option value="online_experience">Online Experience</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <div class="slider-header">
+          <label for="level" style="margin:0">Karen Level</label>
+          <span id="karen-badge">&#x1F60A; 0 &mdash; Politely Disappointed</span>
+        </div>
+        <input type="range" id="level" name="karen_level" min="0" max="5" value="0" />
+        <div class="ticks" aria-hidden="true">
+          <span>&#x1F60A;</span>
+          <span>&#x1F612;</span>
+          <span>&#x1F624;</span>
+          <span>&#x1F621;</span>
+          <span>&#x1F92C;</span>
+          <span>&#x1F4A5;</span>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary" id="submit-btn">&#x26A1; KARENIZE IT!</button>
     </form>
+  </div>
+
+  <!-- RIGHT: RESULT PANEL -->
+  <div class="card">
+
+    <div id="s-empty">
+      <div class="state-empty">
+        <span class="big-icon">&#x1F4E2;</span>
+        <p>Your legendary complaint will appear here.<br>Fill in your grievance and unleash the Karen.</p>
+      </div>
+    </div>
+
+    <div id="s-loading" hidden>
+      <div class="state-loading">
+        <span class="spin">&#x26A1;</span>
+        <div class="loading-label">Channeling your inner Karen&hellip;</div>
+      </div>
+    </div>
+
+    <div id="s-error" hidden>
+      <div class="card-label">Something Went Wrong</div>
+      <div class="error-box" id="error-text"></div>
+    </div>
+
+    <div id="s-result" hidden>
+      <div class="card-label">Your Complaint</div>
+      <div class="meta-chips">
+        <span class="chip" id="chip-company"></span>
+        <span class="chip" id="chip-level"></span>
+      </div>
+      <div class="complaint-output" id="output"></div>
+      <div class="result-actions">
+        <button class="btn-sec" id="btn-copy" onclick="doCopy()">&#x1F4CB; Copy</button>
+        <button class="btn-sec" onclick="doReset()">&#x270D;&#xFE0F; Write Another</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>KARENIZER &mdash; Because sometimes, the world needs to hear from you. Loudly.</footer>
+
+<script>
+  const LEVELS = [
+    { emoji: '\u{1F60A}', label: 'Politely Disappointed' },
+    { emoji: '\u{1F612}', label: 'Mildly Frustrated' },
+    { emoji: '\u{1F624}', label: 'Noticeably Upset' },
+    { emoji: '\u{1F621}', label: 'Full Karen Mode' },
+    { emoji: '\u{1F92C}', label: 'Nuclear Option' },
+    { emoji: '\u{1F4A5}', label: 'PEAK KAREN' },
+  ];
+
+  const slider    = document.getElementById('level');
+  const badge     = document.getElementById('karen-badge');
+  const form      = document.getElementById('form');
+  const submitBtn = document.getElementById('submit-btn');
+
+  slider.addEventListener('input', () => {
+    const { emoji, label } = LEVELS[+slider.value];
+    badge.textContent = `${emoji} ${slider.value} — ${label}`;
+  });
+
+  function show(state) {
+    ['empty', 'loading', 'error', 'result'].forEach(s => {
+      document.getElementById(`s-${s}`).hidden = (s !== state);
+    });
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    show('loading');
+
+    const payload = {
+      company_name:   form.company_name.value.trim(),
+      complaint_body: form.complaint_body.value.trim(),
+      complaint_type: form.complaint_type.value,
+      karen_level:    parseInt(form.karen_level.value),
+    };
+
+    try {
+      const res = await fetch('/api/generate', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: `HTTP ${res.status}` }));
+        throw new Error(err.detail || 'Request failed');
+      }
+
+      const data = await res.json();
+      const { emoji, label } = LEVELS[data.karen_level];
+
+      document.getElementById('output').textContent       = data.complaint;
+      document.getElementById('chip-company').textContent = `\u{1F3E2} ${data.company_name}`;
+      document.getElementById('chip-level').textContent   = `${emoji} Level ${data.karen_level} — ${label}`;
+      show('result');
+    } catch (err) {
+      document.getElementById('error-text').textContent = err.message;
+      show('error');
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+
+  async function doCopy() {
+    const text = document.getElementById('output').textContent;
+    const btn  = document.getElementById('btn-copy');
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const ta = Object.assign(document.createElement('textarea'), { value: text });
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '\u{1F4CB} Copy'; btn.classList.remove('copied'); }, 2000);
+  }
+
+  function doReset() { show('empty'); }
+</script>
+
 </body>
 </html>
-
